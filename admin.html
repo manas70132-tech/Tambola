@@ -61,6 +61,19 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+
+    // Publish Function
+    function publish() {
+      let msg = document.getElementById("message").value;
+      db.collection("updates").doc("live").set({
+        text: msg,
+        time: new Date()
+      }).then(() => {
+        alert("Update done ✅");
+      });
+    }
+  </script>
+
 /* Top-level refs */
 const currentGameRef = db.ref('currentGame');
 const nextGameRef = db.ref('nextGame');
