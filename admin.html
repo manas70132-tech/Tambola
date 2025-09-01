@@ -62,18 +62,44 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 
-    // Publish Function
-    function publish() {
-      let msg = document.getElementById("message").value;
-      db.collection("updates").doc("live").set({
-        text: msg,
-        time: new Date()
-      }).then(() => {
-        alert("Update done ✅");
-      });
-    }
-  </script>
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
+  // 🔹 Firebase Config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "XXXXXXX",
+    appId: "YOUR_APP_ID"
+  };
+
+  // 🔹 Init
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  
+ // 🔹 Publish Function
+  async function publishPost() {
+    let title = document.getElementById("title").value;
+    let message = document.getElementById("message").value;
+
+    if (title && message) {
+      await addDoc(collection(db, "posts"), {
+        title: title,
+        message: message,
+        timestamp: serverTimestamp()
+      });
+      alert("✅ Post Published Successfully!");
+    } else {
+      alert("⚠️ Please fill all fields");
+    }
+  }
+
+  document.getElementById("publishBtn").addEventListener("click", publishPost);
+</script>
 /* Top-level refs */
 const currentGameRef = db.ref('currentGame');
 const nextGameRef = db.ref('nextGame');
