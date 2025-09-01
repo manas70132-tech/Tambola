@@ -366,18 +366,23 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-      // Publish Function
-    function publish() {
-      let msg = document.getElementById("message").value;
-      db.collection("updates").doc("live").set({
-        text: msg,
-        time: new Date()
-      }).then(() => {
-        alert("Update done ✅");
-      });
-    }
+      
+   // 🔹 Live Update Function
+  const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
+  onSnapshot(q, (snapshot) => {
+    let output = "";
+    snapshot.forEach((doc) => {
+      let data = doc.data();
+      output += `<div class="post">
+                  <h3>${data.title}</h3>
+                  <p>${data.message}</p>
+                </div>`;
+    });
+    document.getElementById("posts").innerHTML = output;
+  });
 </script>
-  
+
+<div id="posts"></div>
 
 /* ================= Elements ================= */
 const boardEl = document.getElementById('board');
