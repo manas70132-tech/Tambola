@@ -1310,6 +1310,60 @@ musicBtn.addEventListener("click", ()=>{
   }
 });
 </script>
+<!-- Razorpay Payment Button -->
+  <button id="payBtn">Pay ₹500</button>
+
+  <!-- Razorpay Script -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    document.getElementById("payBtn").onclick = async function () {
+      try {
+        // Step 1: Create order from backend
+        const orderResponse = await fetch("http://localhost:3000/create-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: 50000 }) // 50000 paise = ₹500
+        });
+
+        const order = await orderResponse.json();
+
+        // Step 2: Razorpay checkout
+        const options = {
+          key: "rzp_test_XvnkqZ2vlzuxUO", // 👈 apna Razorpay Key ID yaha dalna
+          amount: order.amount,
+          currency: order.currency,
+          name: "Point Break Adventure",
+          description: "Booking Payment",
+          order_id: order.id,
+          handler: async function (response) {
+            // Step 3: Verify payment
+            const verifyResponse = await fetch("http://localhost:3000/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                order_id: response.razorpay_order_id,
+                payment_id: response.razorpay_payment_id,
+                signature: response.razorpay_signature
+              })
+            });
+
+            const result = await verifyResponse.json();
+            if (result.success) {
+              alert("✅ Payment Successful!");
+            } else {
+              alert("❌ Payment Verification Failed");
+            }
+          },
+          theme: { color: "#3399cc" }
+        };
+
+        const rzp1 = new Razorpay(options);
+        rzp1.open();
+      } catch (err) {
+        console.error(err);
+        alert("Error in Payment!");
+      }
+    };
 
 </body>
 </html>
